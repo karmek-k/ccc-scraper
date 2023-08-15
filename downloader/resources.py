@@ -45,6 +45,7 @@ def get_page(url):
     if not response.ok:
         die(f'error while requesting {response.url}: status {toc_page.status_code}')
     
+    response.encoding = 'iso-8859-2'
     write_resource(resource, response.text)
 
     return response.text
