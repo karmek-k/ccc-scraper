@@ -4,7 +4,7 @@ import re
 
 import requests
 
-from scraper.utils import die
+from downloader.utils import die
 
 
 DOWNLOAD_DIR = 'download/'
