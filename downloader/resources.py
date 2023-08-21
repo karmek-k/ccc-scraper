@@ -5,6 +5,7 @@ import re
 import requests
 
 from downloader.utils import die
+from downloader.errors import RequestError
 
 
 ROOT_DIR = 'download/'
@@ -46,7 +47,7 @@ def get_page(url):
     response = requests.get(url)
 
     if not response.ok:
-        die(f'error while requesting {response.url}: status {toc_page.status_code}')
+        raise RequestError(response)
     
     response.encoding = 'iso-8859-2'
     write_resource(resource, response.text)
