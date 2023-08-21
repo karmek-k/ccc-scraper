@@ -7,13 +7,13 @@ import requests
 from downloader.utils import die
 
 
-DOWNLOAD_DIR = 'download/'
+ROOT_DIR = 'download/'
 
 
 def get_resource_path(name):
     """Returns the path of a resource, or `None` if there is no such resource"""
 
-    maybe_path = f'{DOWNLOAD_DIR}/{name}'
+    maybe_path = f'{ROOT_DIR}/{name}'
     
     if os.path.isfile(maybe_path):
         return maybe_path
@@ -24,10 +24,10 @@ def get_resource_path(name):
 def write_resource(name, content):
     """Adds a new resource file. Creates the resource directory if it does not exist"""
 
-    if not os.path.exists(DOWNLOAD_DIR):
-        os.mkdir(DOWNLOAD_DIR)
+    if not os.path.exists(ROOT_DIR):
+        os.mkdir(ROOT_DIR)
 
-    with open(f'{DOWNLOAD_DIR}/{name}', 'w') as fp:
+    with open(f'{ROOT_DIR}/{name}', 'w') as fp:
         fp.write(content)
 
 
