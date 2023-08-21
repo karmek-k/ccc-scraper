@@ -22,7 +22,10 @@ def get_resource_path(name):
 
 
 def write_resource(name, content):
-    """Adds a new resource file"""
+    """Adds a new resource file. Creates the resource directory if it does not exist"""
+
+    if not os.path.exists(DOWNLOAD_DIR):
+        os.mkdir(DOWNLOAD_DIR)
 
     with open(f'{DOWNLOAD_DIR}/{name}', 'w') as fp:
         fp.write(content)
