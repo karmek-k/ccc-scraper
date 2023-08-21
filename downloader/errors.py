@@ -3,3 +3,5 @@ class RequestError(BaseException):
 
     def __init__(self, response):
         super().__init__(f'error while requesting {response.url}: status {response.status_code}')
+
+        self.response = response
