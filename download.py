@@ -1,16 +1,16 @@
-from downloader.constants import get_toc_url, BASE_URL
-from downloader.resources import get_page
+from downloader.constants import get_toc_url, get_url, RESOURCE_CATECHISM, RESOURCE_FOOTNOTES
+from downloader.resources import get_page, make_path
 from downloader.errors import RequestError
 from downloader.content import make_soup, anchors_to_resources, find_footnote_resources
 
 
-def download(resource):
+def download(resource, subdirectory=None):
     """Downloads a resource"""
 
-    print(f'Downloading {resource}')
+    print(f'Downloading {make_path(resource, subdirectory)}')
 
     try:
-        return get_page(f'{BASE_URL}/{resource}')
+        return get_page(get_url(resource), subdirectory)
     except RequestError as e:
         print(f'Failed to download {resource} - status {e.response.status_code}')
 
@@ -23,10 +23,10 @@ toc_soup = make_soup(toc_page)
 anchors = toc_soup.find_all('a')
 
 for resource in anchors_to_resources(anchors):
-    html = download(resource)
+    html = download(resource, RESOURCE_CATECHISM)
 
     footnotes = find_footnote_resources(html)
     for footnote in footnotes:
-        download(footnote)
+        download(footnote, RESOURCE_FOOTNOTES)
 
 print('Done')
