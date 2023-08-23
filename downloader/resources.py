@@ -8,7 +8,7 @@ from downloader.utils import die
 from downloader.errors import RequestError
 
 
-ROOT_DIR = 'download/'
+ROOT_DIR = 'resources/'
 
 
 def get_resource_path(name):
