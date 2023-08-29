@@ -4,11 +4,12 @@ import re
 
 import requests
 
+import downloader.constants as constants
 from downloader.utils import die
 from downloader.errors import RequestError
 
 
-ROOT_DIR = 'resources/'
+ROOT_DIR = constants.RESOURCE_ROOT_DIR
 
 
 def make_path(name, subdirectory=None):
@@ -64,8 +65,20 @@ def get_page(url, subdirectory=None):
     if not response.ok:
         raise RequestError(response)
     
-    response.encoding = 'iso-8859-2'
+    response.encoding = constants.SITE_ENCODING
     write_resource(resource, response.text, subdirectory)
 
     return response.text
     
+
+def open_resource(name, subdirectory=None, mode='r'):
+    """
+    Opens a resource file using the `open()` function.
+    Raises a `FileNotFoundError` if the resource could not be found
+    """
+
+    path = get_resource_path(name, subdirectory)
+    if path is None:
+        raise FileNotFoundError(f'Did not find file: {make_path(name, subdirectory)}')
+    
+    return open(path, mode)
