@@ -12,6 +12,8 @@ ROOT_DIR = 'resources/'
 
 
 def make_path(name, subdirectory=None):
+    """Builds the path to a resource"""
+
     # make sure it ends with a slash
     root = ROOT_DIR if ROOT_DIR[-1] == '/' else f'{ROOT_DIR}/'
 

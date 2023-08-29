@@ -5,7 +5,7 @@ from downloader.content import make_soup, anchors_to_resources, find_footnote_re
 
 
 def download(resource, subdirectory=None):
-    """Downloads a resource"""
+    """Downloads and saves a resource. Returns its contents in plain text"""
 
     print(f'Downloading {make_path(resource, subdirectory)}')
 
@@ -22,9 +22,11 @@ toc_soup = make_soup(toc_page)
 
 anchors = toc_soup.find_all('a')
 
+# download all chapters in the table of contents
 for resource in anchors_to_resources(anchors):
     html = download(resource, RESOURCE_CATECHISM)
 
+    # find all footnote indexes in the chapter and download them
     footnotes = find_footnote_resources(html)
     for footnote in footnotes:
         download(footnote, RESOURCE_FOOTNOTES)
