@@ -12,16 +12,22 @@ from downloader.errors import RequestError
 ROOT_DIR = constants.RESOURCE_ROOT_DIR
 
 
-def make_path(name, subdirectory=None):
-    """Builds the path to a resource"""
+def _none_to_empty(string=None):
+    """Returns an empty string if `string is None`, else returns the string unchanged"""
+
+    return '' if string is None else string
+
+def make_path(name=None, subdirectory=None):
+    """Builds the path to a resource or a subdirectory"""
 
     # make sure it ends with a slash
     root = ROOT_DIR if ROOT_DIR[-1] == '/' else f'{ROOT_DIR}/'
 
     # `None` to empty string
-    subdirectory = '' if subdirectory is None else f'{subdirectory}/'
+    name = _none_to_empty(name)
+    subdirectory = _none_to_empty(subdirectory)
 
-    return f'{ROOT_DIR}{subdirectory}{name}'
+    return os.path.join(ROOT_DIR, subdirectory, name)
 
 
 def get_resource_path(name, subdirectory=None):
