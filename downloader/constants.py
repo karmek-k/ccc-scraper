@@ -7,6 +7,7 @@ SITE_ENCODING = 'iso-8859-2'
 # subdirectories
 RESOURCE_CATECHISM = 'catechism'
 RESOURCE_FOOTNOTES = 'footnotes'
+RESOURCE_SCRAPED = 'scraped'
 
 # resource names
 RESOURCE_NAME_TOC = 'spistr.htm'
