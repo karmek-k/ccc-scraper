@@ -88,3 +88,20 @@ def open_resource(name, subdirectory=None, mode='r'):
         raise FileNotFoundError(f'Did not find file: {make_path(name, subdirectory)}')
     
     return open(path, mode)
+
+
+def list_resources(subdirectory=None):
+    """
+    Returns an iterable object of resources in the root directory.
+    If `subdirectory` is given, then lists resources only in that subdirectory.
+    """
+
+    def is_resource_callback(name):
+        return os.path.isfile(make_path(name, subdirectory))
+    
+
+    subdirectory_path = make_path(subdirectory=subdirectory)
+    print(subdirectory_path)
+
+    return filter(is_resource_callback, os.listdir(subdirectory_path))
+    
