@@ -6,7 +6,7 @@ import requests
 
 import downloader.constants as constants
 from downloader.utils import die
-from downloader.errors import RequestError
+from downloader.errors import RequestError, ResourceNotFoundError
 
 
 ROOT_DIR = constants.RESOURCE_ROOT_DIR
@@ -39,6 +39,18 @@ def get_resource_path(name, subdirectory=None):
         return maybe_path
     
     return None
+
+
+def get_resource(name, subdirectory=None):
+    """Gets a resource's text content. Raises `ResourceNotFoundError` if not found"""
+
+    path = get_resource_path(name, subdirectory)
+
+    if path is None:
+        raise ResourceNotFoundError(name, subdirectory)
+    
+    with open_resource(name, subdirectory) as fp:
+        return fp.read()
 
 
 def write_resource(name, content, subdirectory=None):

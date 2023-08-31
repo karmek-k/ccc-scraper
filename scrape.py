@@ -1,29 +1,19 @@
-import json
-import re
-
-from downloader.resources import list_resources, open_resource, write_resource
-from downloader.constants import RESOURCE_FOOTNOTES, RESOURCE_SCRAPED
-
-
-def scrape_footnotes(html):
-    """Scrape footnotes from a HTML file into a list of pairs"""
-
-    regex = r"""<a name=\"(\d+)\"><\/a>
-.+&nbsp;&nbsp;(.+)<br><br>"""
-
-    return re.findall(regex, html, re.I)
+from downloader.resources import get_resource
+from downloader.constants import RESOURCE_FOOTNOTES
+from scraper.constants import RESOURCE_SCRAPED, RESOURCE_FILE_FOOTNOTES
+from scraper.footnotes import scrape_all_footnotes, save_footnotes, has_footnotes_saved
 
 
-footnotes = {}
-for res in list_resources(RESOURCE_FOOTNOTES):
-    with open_resource(res, RESOURCE_FOOTNOTES) as fp:
-        html = fp.read()
-    
-    pairs = scrape_footnotes(html)
-    print(f'{len(pairs)} footnotes in {res}')
-    
-    for k, v in pairs:
-        footnotes[int(k)] = v
-    
-footnotes_json = json.dumps(footnotes, ensure_ascii=False)
-write_resource('footnotes.json', footnotes_json, subdirectory=RESOURCE_SCRAPED)
+def make_footnotes():
+    """Scrapes and saves footnotes, if needed. Returns a footnote dictionary"""
+
+    if has_footnotes_saved():
+        footnotes = scrape_all_footnotes(RESOURCE_FOOTNOTES)
+        save_footnotes(footnotes, RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED)
+
+        return footnotes
+
+    return get_resource(RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED)
+
+
+footnotes = make_footnotes()
