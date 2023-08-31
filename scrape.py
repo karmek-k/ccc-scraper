@@ -1,19 +1,29 @@
-from downloader.resources import get_resource
+import json
+
+
+from downloader.resources import Resource
 from downloader.constants import RESOURCE_FOOTNOTES
 from scraper.constants import RESOURCE_SCRAPED, RESOURCE_FILE_FOOTNOTES
 from scraper.footnotes import scrape_all_footnotes, save_footnotes, has_footnotes_saved
 
 
+def footnotes_resource():
+    return Resource(RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED)
+
+
 def make_footnotes():
     """Scrapes and saves footnotes, if needed. Returns a footnote dictionary"""
 
-    if has_footnotes_saved():
-        footnotes = scrape_all_footnotes(RESOURCE_FOOTNOTES)
-        save_footnotes(footnotes, RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED)
+    resource = footnotes_resource()
 
-        return footnotes
+    if Resource.is_saved(resource.name, resource.subdirectory):
+        with resource.open() as f:
+            return json.load(f)
 
-    return get_resource(RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED)
+    footnotes = scrape_all_footnotes(RESOURCE_FOOTNOTES)
+    save_footnotes(footnotes, resource)
+
+    return footnotes
 
 
 footnotes = make_footnotes()

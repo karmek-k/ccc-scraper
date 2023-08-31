@@ -40,20 +40,22 @@ class Resource:
         return Resource.make_path(self.name, self.subdirectory)
 
 
-    def is_saved(self):
+    @staticmethod
+    def is_saved(name, subdirectory=None):
         """Is the resource saved on disk"""
 
-        maybe_path = self._make_path()
+        maybe_path = Resource.make_path()
 
         return os.path.isfile(maybe_path)
 
 
-    def get_path(self):
+    @staticmethod
+    def get_path(name=None, subdirectory=None):
         """Returns the path of a resource, or `None` if there is no such resource"""
 
-        maybe_path = self._make_path()
+        maybe_path = Resource.make_path(name, subdirectory)
 
-        if self.is_saved():
+        if Resource.is_saved(name, subdirectory):
             return maybe_path
         return None
 
@@ -94,13 +96,15 @@ class Resource:
         return open(path, mode, encoding=encoding)
 
 
-    def list_resources(self, subdirectory=None):
+    @classmethod
+    def list_resources(cls, subdirectory=None):
         """
         Returns an iterable object of resources in the root directory.
         If `subdirectory` is given, then lists resources only in that subdirectory.
         """
 
-        subdirectory_path = Resource.make_path(subdirectory=subdirectory)
+        subdirectory_path = cls.make_path(subdirectory=subdirectory)
 
-        return filter(self.is_saved, os.listdir(subdirectory_path))
-        
+        for name in os.listdir(subdirectory_path):
+            if cls.is_saved(name, subdirectory):
+                yield cls(name, subdirectory)

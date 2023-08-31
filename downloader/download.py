@@ -15,7 +15,7 @@ def get_page(url, subdirectory=None):
 
     resource = Resource(resource_name, subdirectory)
 
-    if resource.is_saved():
+    if Resource.is_saved(resource.name, resource.subdirectory):
         return resource.read()
     
     page_content = download_content(url, SITE_ENCODING)
