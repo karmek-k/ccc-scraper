@@ -9,14 +9,14 @@ def make_soup(html):
     return BeautifulSoup(html, features='html.parser')
 
 
-def anchors_to_resources(anchors):
+def anchors_to_resource_names(anchors):
     """Transform anchors from `soup.find_all('a') to chapter resource names"""
 
     anchor_hrefs = map(lambda a: a['href'].replace('rkkk', 'kkk'), anchors)
     return filter(lambda href: href.startswith('kkk'), anchor_hrefs)
 
 
-def find_footnote_resources(html):
+def find_footnote_resource_names(html):
     """Finds footnote resources in a HTML document"""
 
     soup = make_soup(html)
