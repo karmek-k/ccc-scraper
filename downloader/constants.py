@@ -8,8 +8,8 @@ PART_NUMBERS_ROMAN = ['I', 'II', 'III', 'IV']
 SITE_ENCODING = 'iso-8859-2'
 
 # subdirectories
-RESOURCE_CATECHISM = 'catechism'
-RESOURCE_FOOTNOTES = 'footnotes'
+DIR_CATECHISM = 'catechism'
+DIR_FOOTNOTES = 'footnotes'
 
 # resource names
 RESOURCE_NAME_TOC = 'spistr.htm'

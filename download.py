@@ -1,4 +1,4 @@
-from downloader.constants import get_toc_url, get_url, RESOURCE_CATECHISM, RESOURCE_FOOTNOTES
+from downloader.constants import get_toc_url, get_url, DIR_CATECHISM, DIR_FOOTNOTES
 from downloader.download import get_page
 from downloader.resources import Resource
 from downloader.errors import RequestError
@@ -27,11 +27,11 @@ anchors = toc_soup.find_all('a')
 
 # download all chapters in the table of contents
 for resource_name in anchors_to_resource_names(anchors):
-    html = download(resource_name, RESOURCE_CATECHISM)
+    html = download(resource_name, DIR_CATECHISM)
 
     # find all footnote indexes in the chapter and download them
     footnotes = find_footnote_resource_names(html)
     for footnote in footnotes:
-        download(footnote, RESOURCE_FOOTNOTES)
+        download(footnote, DIR_FOOTNOTES)
 
 print('Done')

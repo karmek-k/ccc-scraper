@@ -2,7 +2,7 @@ import json
 import re
 
 from downloader.resources import Resource
-from scraper.constants import RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED
+from scraper.constants import RESOURCE_FILE_FOOTNOTES, DIR_SCRAPED
 
 
 def scrape_footnotes(html):
@@ -37,4 +37,4 @@ def save_footnotes(footnotes, resource):
 
 
 def has_footnotes_saved():
-    return Resource.get_path(RESOURCE_FILE_FOOTNOTES, RESOURCE_SCRAPED) is not None
+    return Resource.get_path(RESOURCE_FILE_FOOTNOTES, DIR_SCRAPED) is not None

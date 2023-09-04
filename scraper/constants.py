@@ -1,3 +1,3 @@
-RESOURCE_SCRAPED = 'scraped'
+DIR_SCRAPED = 'scraped'
 
 RESOURCE_FILE_FOOTNOTES = 'footnotes.json'
