@@ -1,8 +1,8 @@
 import json
 
-
+from downloader.content import make_soup
 from downloader.resources import Resource
-from downloader.constants import DIR_FOOTNOTES
+from downloader.constants import DIR_FOOTNOTES, DIR_CATECHISM, get_url
 from scraper.constants import DIR_SCRAPED, RESOURCE_FILE_FOOTNOTES
 from scraper.footnotes import scrape_all_footnotes, save_footnotes, has_footnotes_saved
 
@@ -28,3 +28,13 @@ def make_footnotes():
 
 footnotes = make_footnotes()
 
+
+for resource in Resource.list_resources(DIR_CATECHISM):
+    html = resource.read()
+    soup = make_soup(html)
+
+    result = {
+        'source': get_url(resource)
+    }
+
+    print(result)
