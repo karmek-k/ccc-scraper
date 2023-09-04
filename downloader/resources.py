@@ -80,7 +80,10 @@ class Resource:
     def save(self):
         """Adds a new resource file. Creates the resource directory if it does not exist"""
 
-        directory = self.subdirectory if self.subdirectory is not None else ROOT_DIR
+        directory = ROOT_DIR
+
+        if self.subdirectory is not None:
+            directory = os.path.join(directory, self.subdirectory)
 
         if not os.path.exists(directory):
             os.mkdir(directory)
