@@ -15,7 +15,7 @@ def download(name, subdirectory=None):
     try:
         return get_page(get_url(resource), subdirectory)
     except RequestError as e:
-        print(f'Failed to download {resource.get_path()} - status {e.response.status_code}')
+        print(f'Failed to download {resource.name} - status {e.response.status_code}')
 
 
 print('Downloading table of contents...')
