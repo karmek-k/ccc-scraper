@@ -113,3 +113,11 @@ class Resource:
         for name in os.listdir(subdirectory_path):
             if cls.is_saved(name, subdirectory):
                 yield cls(name, subdirectory)
+
+
+    def __str__(self):
+        return self._make_path()
+
+
+    def __repr__(self):
+        return f'<Resource: {self.__str__()}>'
