@@ -1,12 +1,7 @@
-from sys import stderr
 import os
-import re
 
-import requests
-
-import downloader.constants as constants
-from downloader.utils import die
-from downloader.errors import RequestError, ResourceNotFoundError
+from downloader import constants
+from downloader.errors import ResourceNotFoundError
 
 
 ROOT_DIR = constants.RESOURCE_ROOT_DIR
@@ -17,103 +12,104 @@ def _none_to_empty(string=None):
 
     return '' if string is None else string
 
-def make_path(name=None, subdirectory=None):
-    """Builds the path to a resource or a subdirectory"""
 
-    # make sure it ends with a slash
-    root = ROOT_DIR if ROOT_DIR[-1] == '/' else f'{ROOT_DIR}/'
-
-    # `None` to empty string
-    name = _none_to_empty(name)
-    subdirectory = _none_to_empty(subdirectory)
-
-    return os.path.join(ROOT_DIR, subdirectory, name)
+class Resource:
+    def __init__(self, name, subdirectory=None, content=None):
+        self.name = name
+        self.subdirectory = subdirectory
+        self.content = content
 
 
-def get_resource_path(name, subdirectory=None):
-    """Returns the path of a resource, or `None` if there is no such resource"""
+    @staticmethod
+    def make_path(name=None, subdirectory=None):
+        """Builds the path to a resource or a subdirectory"""
 
-    maybe_path = make_path(name, subdirectory)    
+        # make sure it ends with a slash
+        root = ROOT_DIR if ROOT_DIR[-1] == '/' else f'{ROOT_DIR}/'
 
-    if os.path.isfile(maybe_path):
-        return maybe_path
-    
-    return None
+        # `None` to empty string
+        name = _none_to_empty(name)
+        subdirectory = _none_to_empty(subdirectory)
 
-
-def get_resource(name, subdirectory=None):
-    """Gets a resource's text content. Raises `ResourceNotFoundError` if not found"""
-
-    path = get_resource_path(name, subdirectory)
-
-    if path is None:
-        raise ResourceNotFoundError(name, subdirectory)
-    
-    with open_resource(name, subdirectory) as fp:
-        return fp.read()
+        return os.path.join(root, subdirectory, name)
 
 
-def write_resource(name, content, subdirectory=None):
-    """Adds a new resource file. Creates the resource directory if it does not exist"""
+    def _make_path(self):
+        """Private version of make_path"""
 
-    path = make_path(name, subdirectory)
-    directory, _ = os.path.split(path)
-
-    if not os.path.exists(directory):
-        os.mkdir(directory)
-
-    with open(path, 'w') as fp:
-        fp.write(content)
+        return Resource.make_path(self.name, self.subdirectory)
 
 
-def get_page(url, subdirectory=None):
-    """Loads the page resource content. Downloads the page if it is required"""
+    @staticmethod
+    def is_saved(name, subdirectory=None):
+        """Is the resource saved on disk"""
 
-    resource_regex = r'^http://[\w.]+/(.*)$'
-    resource = re.findall(resource_regex, url)[0]
+        maybe_path = Resource.make_path(name, subdirectory)
 
-    resource_path = get_resource_path(resource, subdirectory)
+        return os.path.isfile(maybe_path)
 
-    if resource_path is not None:
-        with open(resource_path) as fp:
-            return fp.read()
 
-    response = requests.get(url)
+    @staticmethod
+    def get_path(name=None, subdirectory=None):
+        """Returns the path of a resource, or `None` if there is no such resource"""
 
-    if not response.ok:
-        raise RequestError(response)
-    
-    response.encoding = constants.SITE_ENCODING
-    write_resource(resource, response.text, subdirectory)
+        maybe_path = Resource.make_path(name, subdirectory)
 
-    return response.text
+        if Resource.is_saved(name, subdirectory):
+            return maybe_path
+        return None
     
 
-def open_resource(name, subdirectory=None, mode='r'):
-    """
-    Opens a resource file using the `open()` function.
-    Raises a `FileNotFoundError` if the resource could not be found
-    """
+    def _get_path(self):
+        """Private version of get_path"""
 
-    path = get_resource_path(name, subdirectory)
-    if path is None:
-        raise FileNotFoundError(f'Did not find file: {make_path(name, subdirectory)}')
-    
-    return open(path, mode)
+        return Resource.get_path(self.name, self.subdirectory)
 
 
-def list_resources(subdirectory=None):
-    """
-    Returns an iterable object of resources in the root directory.
-    If `subdirectory` is given, then lists resources only in that subdirectory.
-    """
+    def read(self):
+        """Gets a resource's text content. Raises `ResourceNotFoundError` if not found"""
 
-    def is_resource_callback(name):
-        return os.path.isfile(make_path(name, subdirectory))
-    
+        path = self._get_path()
 
-    subdirectory_path = make_path(subdirectory=subdirectory)
-    print(subdirectory_path)
+        if path is None:
+            raise ResourceNotFoundError(self)
+        with self.open() as f:
+            return f.read()
 
-    return filter(is_resource_callback, os.listdir(subdirectory_path))
-    
+
+    def save(self):
+        """Adds a new resource file. Creates the resource directory if it does not exist"""
+
+        directory = ROOT_DIR
+
+        if self.subdirectory is not None:
+            directory = os.path.join(directory, self.subdirectory)
+
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+
+        with self.open('w') as f:
+            f.write(self.content)
+
+
+    def open(self, mode='r', encoding='UTF-8'):
+        """
+        Opens a resource file using the `open()` function.
+        """
+
+        path = self._make_path()
+        return open(path, mode, encoding=encoding)
+
+
+    @classmethod
+    def list_resources(cls, subdirectory=None):
+        """
+        Returns an iterable object of resources in the root directory.
+        If `subdirectory` is given, then lists resources only in that subdirectory.
+        """
+
+        subdirectory_path = cls.make_path(subdirectory=subdirectory)
+
+        for name in os.listdir(subdirectory_path):
+            if cls.is_saved(name, subdirectory):
+                yield cls(name, subdirectory)
