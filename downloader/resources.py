@@ -44,7 +44,7 @@ class Resource:
     def is_saved(name, subdirectory=None):
         """Is the resource saved on disk"""
 
-        maybe_path = Resource.make_path()
+        maybe_path = Resource.make_path(name, subdirectory)
 
         return os.path.isfile(maybe_path)
 
@@ -58,12 +58,18 @@ class Resource:
         if Resource.is_saved(name, subdirectory):
             return maybe_path
         return None
+    
+
+    def _get_path(self):
+        """Private version of get_path"""
+
+        return Resource.get_path(self.name, self.subdirectory)
 
 
     def read(self):
         """Gets a resource's text content. Raises `ResourceNotFoundError` if not found"""
 
-        path = self.get_path()
+        path = self._get_path()
 
         if path is None:
             raise ResourceNotFoundError(self)
@@ -74,8 +80,7 @@ class Resource:
     def save(self):
         """Adds a new resource file. Creates the resource directory if it does not exist"""
 
-        path = self.get_path()
-        directory, _ = os.path.split(path)
+        directory = self.subdirectory if self.subdirectory is not None else ROOT_DIR
 
         if not os.path.exists(directory):
             os.mkdir(directory)
@@ -87,12 +92,9 @@ class Resource:
     def open(self, mode='r', encoding='UTF-8'):
         """
         Opens a resource file using the `open()` function.
-        Raises a `FileNotFoundError` if the resource could not be found
         """
 
-        path = self.get_path()
-        if path is None:
-            raise FileNotFoundError(f'Did not find file: {self._make_path()}')
+        path = self._make_path()
         return open(path, mode, encoding=encoding)
 
 
