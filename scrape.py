@@ -34,7 +34,26 @@ for resource in Resource.list_resources(DIR_CATECHISM):
     soup = make_soup(html)
 
     result = {
-        'source': get_url(resource)
+        'source': get_url(resource),
+        'paragraphs': [],
     }
 
+    for paragraph in soup.find_all('p', attrs={'align': 'justify'}):
+        try:
+            # FIXME: also captures footnote numbers
+            number_tag = paragraph.b.extract()
+        except:
+            continue
+
+        number = number_tag.text.strip()
+        
+        if not number.isdecimal():
+            continue
+    
+        result['paragraphs'].append({
+            'number': number,
+            'text': paragraph.text.strip(),
+        })
+
     print(result)
+    break
