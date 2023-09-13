@@ -1,4 +1,5 @@
 import json
+import re
 
 from downloader.content import make_soup
 from downloader.resources import Resource
@@ -38,22 +39,44 @@ for resource in Resource.list_resources(DIR_CATECHISM):
         'paragraphs': [],
     }
 
+    # TODO: improve the crude implementation
+    # FIXME: does not collect paragraphs without numbers
     for paragraph in soup.find_all('p', attrs={'align': 'justify'}):
-        try:
-            # FIXME: also captures footnote numbers
-            number_tag = paragraph.b.extract()
-        except:
-            continue
-
-        number = number_tag.text.strip()
+        # remove anchors
+        for anchor in paragraph.find_all('a'):
+            try:
+                if not anchor['name'].startswith('p'):
+                    anchor.decompose()
+            except:
+                anchor.decompose()
         
-        if not number.isdecimal():
-            continue
-    
-        result['paragraphs'].append({
-            'number': number,
-            'text': paragraph.text.strip(),
-        })
+        # remove strikelines
+        for strike in paragraph.find_all('strike'):
+            strike.decompose()
+        
+        try:
+            number_tag = paragraph.b.extract()
+            number = number_tag.text.strip()
+        except:
+            pass
 
-    print(result)
+        if number.isdecimal():
+            text = paragraph.text.strip().replace('\n', ' ')
+            # TODO: do it with one regex
+            text = re.sub(r' {2,}', ' ', text)
+            text = re.sub(r' +\.', '.', text)
+            text = re.sub(r' +\,', ',', text)
+
+            # append if `text` is not empty
+            if text.strip():
+                result['paragraphs'].append({
+                    'number': number,
+                    'text': text,
+                })
+
+    for p in result['paragraphs']:
+        print(p['number'])
+        print(p['text'])
+        print()
+    # print(result)
     break
